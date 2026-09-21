@@ -102,6 +102,7 @@
         <div id="saving-status" class="text-xs text-slate-400 mb-4 animate-pulse">
           กำลังบันทึกผลคะแนนลงระบบ Google Sheets...
         </div>
+        <div id="review-container" class="mt-6 mb-8 text-left space-y-4 text-sm max-h-96 overflow-y-auto pr-2 custom-scrollbar"></div>
         <div>
           <button onclick="restartQuiz()" class="w-full sm:w-auto px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-medium rounded-lg transition-colors shadow-lg shadow-sky-500/20">
             สุ่มทำแบบทดสอบอีกครั้ง
@@ -136,12 +137,7 @@
 
     const masterQuizData = [
       // --- ข้อสอบเดิม (15 ข้อ) ---
-      {
-        category: "Reset Password",
-        question: "เมื่อร้านค้าแจ้งว่า Reset Password แล้วไม่ได้รับ Email Step แรกที่ต้องตรวจสอบคืออะไร?",
-        options: ["เช็ก Email ใน Asgard", "ตรวจสอบ Username ที่ร้านค้ากรอกขณะกด Reset Password", "ตรวจสอบเงื่อนไขการตั้งรหัสผ่าน", "ส่งเรื่องให้ทีม Tech Support ทันที"],
-        answer: 1
-      },
+
       {
         category: "Reset Password",
         question: "เงื่อนไขความยาวของการตั้งรหัสผ่านใหม่ (Password Policy) คือข้อใด?",
@@ -196,22 +192,12 @@
         options: ["SCBOrderDateTime", "OrderDateTime", "SCBTxNumber", "BankRefNo"],
         answer: 1
       },
+
+
       {
-        category: "BBL Gateway",
-        question: "รายการชำระเงินของ Gateway BBL (ธนาคารกรุงเทพ) ข้อใดเป็นฟิลด์ระบุข้อความเพิ่มเติม (เช่น Installment)?",
-        options: ["Merchant Ref", "Transaction Date", "Payment Method", "Remark"],
-        answer: 3
-      },
-      {
-        category: "BAY KFC Gateway",
-        question: "บัตรเฟิร์สช้อยส์ (First Choice) และ บัตรเครดิตกรุงศรี จะอยู่ในระบบ Gateway ใด?",
-        options: ["Gateway BBL", "Gateway BAY KFC", "Kasikorn Bank", "Chillpay Gateway"],
-        answer: 1
-      },
-      {
-        category: "2C2P Aggregator",
+        category: "2C2P",
         question: "ฟิลด์ 'Payer Mobile No.' และ 'Completed Date Time' เป็นข้อมูลที่ต้องใช้ใน Gateway ใด?",
-        options: ["2C2P Payment Aggregator", "Chillpay Gateway", "BBL Gateway Recurring", "Alipay/Wechat Gateway"],
+        options: ["2C2P Payment", "Chillpay Gateway", "BBL Gateway Recurring", "Alipay/Wechat Gateway"],
         answer: 0
       },
       {
@@ -281,27 +267,46 @@
         answer: 1
       },
       {
-        category: "True/False",
-        question: "การแจ้งปัญหาทุกครั้ง ไม่ว่าจะช่วงเวลาใด สิ่งสำคัญที่สุดคือต้องมีการสร้าง Ticket ในระบบ Venio",
-        options: ["ถูก", "ผิด"],
-        answer: 0
+        category: "Account & Ticket",
+        question: "กรณีที่ร้านค้าต้องการเปลี่ยนที่อยู่อีเมลหลักสำหรับรับใบกำกับภาษี (แก้ไข Email เดิม) เจ้าหน้าที่ควรส่งเรื่องประสานงานต่อไปยังทีมใด?",
+        options: ["ทีม Tech Support (TS)", "ทีม Customer Service (CS)", "ทีม Accounting (ACC)", "ทีม Maketing"],
+        answer: 2
       },
       {
-        category: "True/False",
-        question: "ในช่วงเวลานอกเวลางาน (On-Call) วันจันทร์ - ศุกร์ คือช่วงเวลา 18:00 - 21:00 น.",
-        options: ["ถูก", "ผิด"],
-        answer: 0
-      },
-      {
-        category: "True/False",
-        question: "การดูแลหลังเวลา 21:00 น. เป็นต้นไป เป็นการดูแลตามตารางปกติ",
-        options: ["ถูก", "ผิด"],
+        category: "Tax Invoice",
+        question: "หากร้านค้าต้องการขอใบกำกับภาษีย้อนหลัง 6 เดือน เจ้าหน้าที่ควรแนะนำหรือดำเนินการอย่างไร?",
+        options: ["แนะนำให้ร้านค้ากดดาวน์โหลดเองได้ทันทีผ่านระบบ Merchant Control", "แจ้งประสานงานทีมบัญชี เพื่อให้จัดส่งเอกสารย้อนหลังให้ร้านค้า", "แจ้งร้านค้าว่าไม่สามารถออกเอกสารย้อนหลังเกิน 3 เดือนได้", "ให้ร้านค้าเปิด Ticket ใน Venio เพื่อดาวน์โหลดผ่าน Google Chat"],
         answer: 1
       },
       {
-        category: "True/False",
-        question: "เมื่อสร้าง Ticket ใน Venio ในเวลางาน ระบบจะทำการ Auto Notify ไปยัง Google Chat",
-        options: ["ถูก", "ผิด"],
+        category: "Reset Password",
+        question: "ในกรณีที่ร้านค้าแจ้งว่า Reset Password แล้วไม่ได้รับ Email หากตรวจสอบ Username และ Email ใน Asgard แล้วถูกต้อง ขั้นตอนถัดไปที่ต้องตรวจสอบตามเงื่อนไข Password Policy คือข้อใด?",
+        options: ["ตรวจสอบว่า Password มีความยาวอย่างน้อย 8–64 ตัวอักษร มีตัวพิมพ์ใหญ่ พิมพ์เล็ก ตัวเลข และอักขระพิเศษ", "ตรวจสอบว่า Password มีเฉพาะตัวเลขและตัวอักษรพิมพ์ใหญ่อย่างน้อย 10 ตัวอักษร", "ตรวจสอบว่าร้านค้าใช้งานผ่านระบบปฏิบัติการ iOS หรือ Android", "ส่งเรื่องให้ทีม Tech Support ทันทีโดยไม่ต้องเช็กความปลอดภัยของ Password"],
+        answer: 0
+      },
+      {
+        category: "Payment Issue",
+        question: "การแจ้งเรื่องขอให้ทีม Tech Support ช่วยสร้างรายการชำระเงิน (กรณีชำระเงินสำเร็จแต่ไม่เจอรายการในระบบ) มีเงื่อนไขสำคัญอย่างไร?",
+        options: ["ร้านค้าสามารถโทรเข้าเบอร์ On-Call เพื่อขอสร้างรายการได้โดยตรง", "ต้องเป็นการส่งเรื่องมาจากทีม ACC หรือทีม CS เท่านั้น", "สามารถสร้างรายการได้เฉพาะช่องทาง TrueMoney Wallet เท่านั้น", "ต้องรอให้พ้นช่วงเวลางานปกติ (หลัง 18.00 น.) จึงจะส่งเรื่องได้"],
+        answer: 1
+      },
+      {
+        category: "Incident Management",
+        question: "หากเกิดเหตุฉุกเฉินเร่งด่วนในวันหยุดเวลา 20.00 น. เจ้าหน้าที่ควรปฏิบัติตาม Workflow การแจ้งเรื่องกับทีม Tech Support อย่างไร?",
+        options: ["สร้าง Ticket ในระบบ Venio เพียงอย่างเดียว แล้วรอตอบกลับในวันจันทร์", "ส่งอีเมลหาทีมบัญชีเพื่อขออนุมัติเปิดเคสฉุกเฉิน", "ตรวจสอบ IT On-Call Schedule แล้วโทรหาเจ้าหน้าที่ On-Call พร้อมเปิด Venio Ticket", "โทรติดต่อเบอร์ฉุกเฉินหลัง 21.00 น. ทันทีโดยไม่ต้องเปิด Ticket"],
+        answer: 2
+      },
+
+      {
+        category: "Email Ticket",
+        question: "การรับเรื่องเคสเกี่ยวกับ Email รับใบกำกับภาษี มีการแบ่ง Flow งานระหว่างทีม ACC และทีม TS อย่างไร?",
+        options: ["ทีม ACC ดำเนินการทุกกรณี หากเกิน 4 เดือนค่อยส่งต่อให้ทีม TS", "ทีม TS ดำเนินการกรณี \"แก้ไข Email เดิม\" ส่วนทีม ACC ดำเนินการกรณี \"ขอเพิ่ม Email\"", "ทีม ACC ดำเนินการกรณี \"แก้ไข Email เดิม\" ส่วนทีม TS ดำเนินการกรณี \"ขอเพิ่ม Email\"", "ทีม TS ดำเนินการทุกกรณี โดยต้องให้ทีม ACC กดอนุมัติในระบบ Venio ก่อน"],
+        answer: 2
+      },
+      {
+        category: "Tax Invoice",
+        question: "ร้านค้าต้องการขอใบกำกับภาษีย้อนหลัง Flow การให้บริการจะถูกแบ่งตามเงื่อนไขระยะเวลาอย่างไร?",
+        options: ["ย้อนหลังไม่เกิน 4 เดือน: ให้ร้านค้าดาวน์โหลดเองผ่าน Merchant Control | ย้อนหลังเกิน 4 เดือน: ประสานงานทีม ACC จัดส่งให้", "ย้อนหลังไม่เกิน 3 เดือน: ให้ร้านค้าดาวน์โหลดเองผ่าน Merchant Control | ย้อนหลังเกิน 3 เดือน: ประสานงานทีม TS ดึงข้อมูลให้", "ย้อนหลังไม่เกิน 4 เดือน: เปิด Venio Ticket ให้ทีม TS ส่งให้ | ย้อนหลังเกิน 4 เดือน: ประสานงานทีม ACC จัดส่งให้", "ย้อนหลังไม่เกิน 6 เดือน: ให้ร้านค้าดาวน์โหลดเองผ่าน Merchant Control | ย้อนหลังเกิน 6 เดือน: ไม่สามารถขอเอกสารย้อนหลังได้"],
         answer: 0
       }
     ];
@@ -449,6 +454,36 @@
         msg.innerText = `คะแนนของคุณคือ ${scorePercentage}% (เกณฑ์การผ่านคือ 80% หรือ 8 ข้อขึ้นไป)`;
         scoreDisplay.className = "text-6xl font-extrabold text-rose-400";
       }
+
+      // สร้างส่วนเฉลย
+      const reviewContainer = document.getElementById('review-container');
+      reviewContainer.innerHTML = '<h3 class="text-lg font-bold text-white mb-4 sticky top-0 bg-slate-800 py-2 border-b border-slate-700">เฉลยและคำอธิบาย</h3>';
+      
+      activeQuizData.forEach((q, index) => {
+        const userAns = userAnswers[index];
+        const isCorrect = userAns === q.answer;
+        
+        let explanationText = q.explanation || '';
+        
+        const div = document.createElement('div');
+        div.className = 'p-4 rounded-lg border ' + (isCorrect ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30');
+        
+        div.innerHTML = `
+          <div class="font-medium text-white mb-2">${index + 1}. ${q.question}</div>
+          <div class="${isCorrect ? 'text-emerald-400' : 'text-rose-400'} mb-1">
+            <span class="font-semibold">คำตอบของคุณ:</span> ${userAns !== null ? q.options[userAns] : 'ไม่ได้ตอบ'}
+          </div>
+          ${!isCorrect ? `
+          <div class="text-emerald-400 mb-2">
+            <span class="font-semibold">คำตอบที่ถูกต้อง:</span> ${q.options[q.answer]}
+          </div>` : ''}
+          ${explanationText ? `
+          <div class="mt-3 pt-3 border-t border-slate-700/50 text-slate-300 text-xs leading-relaxed">
+            <span class="font-semibold text-sky-400">คำอธิบาย:</span> ${explanationText}
+          </div>` : ''}
+        `;
+        reviewContainer.appendChild(div);
+      });
 
       saveScoreToGoogleSheet({
         name: userInfo.name,
