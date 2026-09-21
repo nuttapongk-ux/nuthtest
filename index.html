@@ -1,4 +1,37 @@
-<!DOCTYPE html>
+// นำ URL ที่ Copy ไว้ในขั้นตอนที่ 1 มาใส่แทนที่ YOUR_WEB_APP_URL
+const scriptURL = 'YOUR_WEB_APP_URL';
+
+function saveScoreToGoogleSheet(playerName, playerScore) {
+  // สร้างข้อมูลที่จะส่งไป
+  const data = {
+    name: playerName,
+    score: playerScore,
+    timestamp: new Date().toLocaleString('th-TH')
+  };
+
+  // ใช้ fetch API ส่งข้อมูล
+  fetch(scriptURL, {
+    method: 'POST',
+    // ข้อควรระวัง: ใช้ text/plain เพื่อป้องกันปัญหา CORS preflight ในบางเบราว์เซอร์ 
+    // ตัว Apps Script จะรับไปแล้วใช้ JSON.parse แปลงกลับได้
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8' 
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    console.log('บันทึกสำเร็จ!', result);
+    alert('บันทึกคะแนนเรียบร้อยแล้ว!');
+  })
+  .catch(error => {
+    console.error('เกิดข้อผิดพลาด!', error.message);
+  });
+}
+
+// ตัวอย่างการเรียกใช้งานฟังก์ชันเมื่อจบเกมหรือเมื่อต้องการบันทึก
+// saveScoreToGoogleSheet("สมชาย", 1500);
+ <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
